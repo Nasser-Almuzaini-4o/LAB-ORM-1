@@ -1,0 +1,10 @@
+from django.urls import path
+from . import views
+
+app_name = 'posts'
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('new/', views.add_post, name='add_post'),
+    path('theme/', views.toggle_theme, name='toggle_theme'),
+]
