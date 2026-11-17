@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.http import url_has_allowed_host_and_scheme
 from .models import Post
+from django.http import HttpRequest
+from django.views.decorators.http import require_POST
 
 
 def home(request):
@@ -39,6 +41,8 @@ def add_post(request):
             category=request.POST['category'],
             is_published='is_published' in request.POST,
         )
+        if request.FILES.get('image'):
+            post.image = request.FILES['image']
         post.save()
         return redirect('posts:home')
 
@@ -56,3 +60,45 @@ def toggle_theme(request):
     response = redirect(next_url)
     response.set_cookie('theme', theme, max_age=60 * 60 * 24 * 365)
     return response
+
+def post_detail_view(request: HttpRequest, post_id: int):
+    post = get_object_or_404(Post, pk=post_id)
+    published = Post.objects.filter(is_published=True)
+    categories = [
+        {
+            'value': value,
+            'label': label,
+            'icon': Post.ICONS[value],
+            'count': published.filter(category=value).count(),
+        }
+        for value, label in Post.CATEGORIES
+    ]
+    context = {
+        'post': post,
+        'categories': categories,
+        'total': published.count(),
+    }
+    return render(request, 'posts/post_detail.html', context)
+
+
+def post_update_view(request: HttpRequest, post_id: int):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.method == 'POST':
+        post.title = request.POST['title']
+        post.content = request.POST['content']
+        post.category = request.POST['category']
+        post.is_published = 'is_published' in request.POST
+        if 'image' in request.FILES:
+            post.image = request.FILES['image']
+        post.save()
+        return redirect('posts:post_detail', post_id=post.id)
+
+    return render(request, 'posts/post_update.html', {'post': post, 'categories': Post.CATEGORIES})
+
+
+@require_POST
+def delete_post(request: HttpRequest, post_id: int):
+    post = get_object_or_404(Post, pk=post_id)
+    post.delete()
+    return redirect('posts:home')

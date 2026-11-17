@@ -25,16 +25,21 @@
             </div>
 
             {% for post in posts %}
-                <article class="post">
-                    <div class="post-meta">
-                        <span class="badge"><i class="bi {{ post.icon }}"></i>{{ post.get_category_display }}</span>
-                        <span><i class="bi bi-calendar3"></i>{{ post.published_at|date:"F j, Y" }}</span>
-                        <span><i class="bi bi-clock"></i>{{ post.published_at|date:"H:i" }}</span>
-                        <span><i class="bi bi-hourglass-split"></i>{{ post.reading_time }} min read</span>
-                    </div>
-                    <h2>{{ post.title }}</h2>
-                    <div class="post-content">{{ post.content|linebreaks }}</div>
-                </article>
+                <a href="{% url 'posts:post_detail' post.id %}" class="post-link">
+                    <article class="post">
+    {% if post.image %}
+        <img class="post-image" src="{{ post.image.url }}" alt="{{ post.title }}">
+    {% endif %}
+            <div class="post-meta">
+                <span class="badge"><i class="bi {{ post.icon }}"></i>{{ post.get_category_display }}</span>
+                <span><i class="bi bi-calendar3"></i>{{ post.published_at|date:"F j, Y" }}</span>
+                <span><i class="bi bi-clock"></i>{{ post.published_at|date:"H:i" }}</span>
+                <span><i class="bi bi-hourglass-split"></i>{{ post.reading_time }} min read</span>
+            </div>
+            <h2>{{ post.title }}</h2>
+        </article>
+
+                </a>
             {% empty %}
                 <div class="empty">
                     <i class="bi bi-inbox"></i>

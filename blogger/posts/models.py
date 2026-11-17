@@ -31,6 +31,9 @@ class Post(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORIES, default='other')
     is_published = models.BooleanField(default=True)
     published_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='images/', default='images/default.jpg',)
+    file = models.FileField(upload_to='pdfs/', blank=True, null=True)
+    video = models.FileField(upload_to='videos/', blank=True, null=True)
 
     def __str__(self):
         return self.title
