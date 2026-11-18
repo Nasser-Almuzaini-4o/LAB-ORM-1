@@ -522,6 +522,42 @@ i.bi {
     margin-top: 24px;
 }
 
+.reviews-section {
+    margin-top: 32px;
+}
+
+.review {
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+}
+
+.review-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-bottom: 8px;
+    font-family: Arial, sans-serif;
+    font-size: .78rem;
+    color: var(--muted);
+}
+
+.review-meta strong {
+    color: var(--text);
+    font-size: .9rem;
+}
+
+.review p {
+    line-height: 1.7;
+}
+
+.review-form textarea {
+    min-height: 140px;
+}
+
 .form-box .img-fluid {
     display: block;
     width: 150px;

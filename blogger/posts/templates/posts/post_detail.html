@@ -30,6 +30,47 @@
                 </button>
                 <a href="{% url 'posts:home' %}" class="btn"><i class="bi bi-house"></i>Back to Home</a>
             </article>
+
+            <section class="reviews-section">
+                <div class="section-head">
+                    <h2><i class="bi bi-chat-left-text"></i>Comments</h2>
+                    <span>{{ reviews|length }} comments</span>
+                </div>
+
+                {% for review in reviews %}
+                    <article class="review">
+                        <div class="review-meta">
+                            <strong>{{ review.name }}</strong>
+                            <span>{{ review.rating }} / 5</span>
+                            <span><i class="bi bi-clock"></i>{{ review.created_at|date:"F j, Y" }}</span>
+                        </div>
+                        <p>{{ review.comment|linebreaksbr }}</p>
+                    </article>
+                {% empty %}
+                    <div class="empty">There are no comments yet.</div>
+                {% endfor %}
+
+                <form method="post" action="{% url 'posts:add_review' post.id %}" class="form-box review-form">
+                    {% csrf_token %}
+                    <label for="review-name"><i class="bi bi-person"></i>Name</label>
+                    <input type="text" id="review-name" name="name" maxlength="1024" required>
+
+                    <label for="review-rating"><i class="bi bi-star"></i>Rating</label>
+                    <select id="review-rating" name="rating" required>
+                        <option value="">Choose a rating</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+
+                    <label for="review-comment"><i class="bi bi-chat-text"></i>Comment</label>
+                    <textarea id="review-comment" name="comment" rows="5" required></textarea>
+
+                    <button type="submit" class="btn"><i class="bi bi-send"></i>Add Comment</button>
+                </form>
+            </section>
         </section>
 
         <aside>

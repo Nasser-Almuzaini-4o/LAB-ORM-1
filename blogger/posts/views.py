@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.http import url_has_allowed_host_and_scheme
-from .models import Post
+from .models import Post ,Review
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
 
@@ -82,6 +82,7 @@ def toggle_theme(request):
 def post_detail_view(request: HttpRequest, post_id: int):
     post = get_object_or_404(Post, pk=post_id)
     published = Post.objects.filter(is_published=True)
+    reviews = post.review_set.order_by('-created_at')
     categories = [
         {
             'value': value,
@@ -95,6 +96,7 @@ def post_detail_view(request: HttpRequest, post_id: int):
         'post': post,
         'categories': categories,
         'total': published.count(),
+        'reviews': reviews,
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -120,3 +122,26 @@ def delete_post(request: HttpRequest, post_id: int):
     post = get_object_or_404(Post, pk=post_id)
     post.delete()
     return redirect('posts:home')
+
+
+@require_POST
+def add_review_view(request: HttpRequest, post_id: int):
+    post_object = get_object_or_404(Post, pk=post_id)
+    name = request.POST.get('name', '').strip()
+    comment = request.POST.get('comment', '').strip()
+    rating = request.POST.get('rating')
+
+    try:
+        rating = int(rating)
+    except (TypeError, ValueError):
+        rating = None
+
+    if name and comment and rating and 1 <= rating <= 5:
+        Review.objects.create(
+            post=post_object,
+            name=name,
+            comment=comment,
+            rating=rating,
+        )
+
+    return redirect('posts:post_detail', post_id=post_id)
