@@ -56,17 +56,34 @@
             </div>
 
             <div class="box">
+                <h3><i class="bi bi-sort-down"></i>Sort Posts</h3>
+                <form method="get" action="{% url 'posts:home' %}">
+                    {% if selected %}
+                        <input type="hidden" name="category" value="{{ selected }}">
+                    {% endif %}
+                    <label for="sort">Sort by</label>
+                    <select id="sort" name="sort">
+                        <option value="reading_asc" {% if sort_order == 'reading_asc' %}selected{% endif %}>Shortest reading time</option>
+                        <option value="reading_desc" {% if sort_order == 'reading_desc' %}selected{% endif %}>Longest reading time</option>
+                        <option value="newest" {% if sort_order == 'newest' %}selected{% endif %}>Newest first</option>
+                        <option value="oldest" {% if sort_order == 'oldest' %}selected{% endif %}>Oldest first</option>
+                    </select>
+                    <button type="submit" class="btn">Apply</button>
+                </form>
+            </div>
+
+            <div class="box">
                 <h3><i class="bi bi-grid"></i>Categories</h3>
                 <ul class="cat-list">
                     <li>
-                        <a href="{% url 'posts:home' %}" {% if not selected %}class="active"{% endif %}>
+                        <a href="{% url 'posts:home' %}{% if sort_order %}?sort={{ sort_order }}{% endif %}" {% if not selected %}class="active"{% endif %}>
                             <span><i class="bi bi-collection"></i>All</span>
                             <em>{{ total }}</em>
                         </a>
                     </li>
                     {% for cat in categories %}
                         <li>
-                            <a href="{% url 'posts:home' %}?category={{ cat.value }}"
+                            <a href="{% url 'posts:home' %}?category={{ cat.value }}{% if sort_order %}&sort={{ sort_order }}{% endif %}"
                                {% if selected == cat.value %}class="active"{% endif %}>
                                 <span><i class="bi {{ cat.icon }}"></i>{{ cat.label }}</span>
                                 <em>{{ cat.count }}</em>

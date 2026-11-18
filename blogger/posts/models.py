@@ -31,9 +31,16 @@ class Post(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORIES, default='other')
     is_published = models.BooleanField(default=True)
     published_at = models.DateTimeField(auto_now_add=True)
+    reading_time = models.PositiveIntegerField(default=1, editable=False)
     image = models.ImageField(upload_to='images/', default='images/default.jpg',)
     file = models.FileField(upload_to='pdfs/', blank=True, null=True)
     video = models.FileField(upload_to='videos/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.reading_time = max(1, len(self.content.split()) // 200)
+        if kwargs.get('update_fields') is not None:
+            kwargs['update_fields'] = (*kwargs['update_fields'], 'reading_time')
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -41,7 +48,3 @@ class Post(models.Model):
     @property
     def icon(self):
         return self.ICONS.get(self.category, 'bi-tag')
-
-    @property
-    def reading_time(self):
-        return max(1, len(self.content.split()) // 200)

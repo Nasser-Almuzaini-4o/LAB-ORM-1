@@ -7,11 +7,28 @@ from django.views.decorators.http import require_POST
 
 def home(request):
     selected = request.GET.get('category')
+    sort_order = request.GET.get('sort', 'newest')
+    sort_order = {
+        'asc': 'reading_asc',
+        'desc': 'reading_desc',
+    }.get(sort_order, sort_order)
+    if sort_order not in ('reading_asc', 'reading_desc', 'newest', 'oldest'):
+        sort_order = 'newest'
+
     published = Post.objects.filter(is_published=True)
-    posts = published.order_by('-published_at')
+    posts = published
 
     if selected:
         posts = posts.filter(category=selected)
+
+    if sort_order == 'reading_asc':
+        posts = posts.order_by('reading_time', '-published_at')
+    elif sort_order == 'reading_desc':
+        posts = posts.order_by('-reading_time', '-published_at')
+    elif sort_order == 'oldest':
+        posts = posts.order_by('published_at')
+    else:
+        posts = posts.order_by('-published_at')
 
     categories = [
         {
@@ -28,6 +45,7 @@ def home(request):
         'categories': categories,
         'selected': selected,
         'selected_label': dict(Post.CATEGORIES).get(selected),
+        'sort_order': sort_order,
         'total': published.count(),
     }
     return render(request, 'posts/home.html', context)
